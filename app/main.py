@@ -25,6 +25,7 @@ from fastapi import Body, FastAPI, Depends, HTTPException, status, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles  # For serving static files (CSS, JS)
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates  # For HTML templates
 
 from sqlalchemy.orm import Session  # SQLAlchemy database session
@@ -39,6 +40,7 @@ from app.schemas.calculation import CalculationBase, CalculationResponse, Calcul
 from app.schemas.token import TokenResponse  # API token schema
 from app.schemas.user import UserCreate, UserResponse, UserLogin  # User schemas
 from app.database import Base, get_db, engine  # Database connection
+from app.core.config import settings
 
 
 # ------------------------------------------------------------------------------
@@ -68,6 +70,15 @@ app = FastAPI(
     description="API for managing calculations",
     version="1.0.0",
     lifespan=lifespan  # Pass our lifespan context manager
+)
+
+# CORS for frontend → backend requests (e.g., www → api)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ------------------------------------------------------------------------------
